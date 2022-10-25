@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const { findByIdAndUpdate } = require("./bootcamp.model");
 
 const CourseSchema = new mongoose.Schema({
 	title: {
@@ -54,7 +53,6 @@ CourseSchema.statics.getAverageCost = async function (bootcampId) {
 			},
 		},
 	]);
-	console.log(arr);
 	try {
 		await this.model("Bootcamp").findByIdAndUpdate(bootcampId, {
 			averageCost: Math.ceil(arr[0].averageCost / 10) * 10,
