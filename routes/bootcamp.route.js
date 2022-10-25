@@ -1,5 +1,4 @@
 const express = require("express");
-const router = express.Router();
 const {
 	fetchAll,
 	fetch,
@@ -8,6 +7,12 @@ const {
 	update,
 	destroy,
 } = require("../controllers/bootcamp.ctrl");
+const coursesRouter = require("./course.route");
+
+const router = express.Router();
+
+// Re-router courses
+router.use("/:bootcampId/courses", coursesRouter);
 
 router.route("/radius/:zipcode/:distance").get(fetchWithinRadius);
 router.route("/").get(fetchAll).post(create);

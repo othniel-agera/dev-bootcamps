@@ -1,12 +1,11 @@
-const Bootcamp = require("../models/bootcamp.model");
+const Course = require("../models/course.model");
 const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("../middlewares/async");
-const geocoder = require("../utils/geocoder");
-const { find } = require("../models/bootcamp.model");
-class BootcampController {
+class CourseController {
 	/**
-	 * @desc Fetch bootcamps
-	 * @route GET /api/vi/bootcamps
+	 * @desc Fetch courses
+	 * @route GET /api/v1/courses
+	 * @route GET /api/v1/bootcamps/:bootcampId/courses
 	 * @access Public
 	 */
 	fetchAll = asyncHandler(async (req, res) => {
@@ -31,7 +30,17 @@ class BootcampController {
 		);
 
 		// Finding resource
-		query = Bootcamp.find(JSON.parse(queryStr)).populate("courses");
+		if (req.params.bootcampId) {
+			query = Course.find({
+				bootcamp: req.params.bootcampId,
+				...JSON.parse(queryStr),
+			});
+		} else {
+			query = Course.find(JSON.parse(queryStr)).populate({
+				path: "bootcamp",
+				select: "name description",
+			});
+		}
 
 		// Select fields
 		if (req.query.select) {
@@ -52,7 +61,7 @@ class BootcampController {
 		const limit = parseInt(req.query.limit, 10) || 25;
 		const startIndex = (page - 1) * limit;
 		const endIndex = page * limit;
-		const total = await Bootcamp.countDocuments();
+		const total = await Course.countDocuments();
 		query = query.skip(startIndex).limit(limit);
 
 		const bootcamps = await query.exec();
@@ -81,11 +90,11 @@ class BootcampController {
 
 	/**
 	 * @desc Fetch bootcamp
-	 * @route GET /api/vi/bootcamps
+	 * @route GET /api/v1/bootcamps
 	 * @access Public
 	 */
 	fetch = asyncHandler(async (req, res) => {
-		const bootcamp = await Bootcamp.findById(req.params.id);
+		const bootcamp = await Course.findById(req.params.id);
 		if (!bootcamp)
 			return next(
 				new ErrorResponse(`Bootcamp not found with id of ${req.params.id}`, 404)
@@ -94,51 +103,22 @@ class BootcampController {
 	});
 
 	/**
-	 * @desc Fetch bootcamp within a radius
-	 * @route GET /api/vi/bootcamps/radius/:zipcode/:distance
-	 * @access Private
-	 */
-	fetchWithinRadius = asyncHandler(async (req, res) => {
-		const { zipcode, distance } = req.params;
-
-		//Get lat/lng from geocoder;
-
-		const loc = await geocoder.geocode(zipcode);
-		const lat = loc[0].latitude;
-		const lng = loc[0].longitude;
-
-		// Calc radius using radians
-		//Divide dist by radius of Earth
-		// Earth Radius = 3,963mi / 6,378km
-		const radius = distance / 3963;
-
-		const bootcamps = await Bootcamp.find({
-			location: { $geoWithin: { $centerSphere: [[lng, lat], radius] } },
-		});
-		res.status(200).json({
-			success: true,
-			count: bootcamps.length,
-			result: bootcamps,
-		});
-	});
-
-	/**
 	 * @desc Create bootcamps
-	 * @route POST /api/vi/bootcamps
+	 * @route POST /api/v1/bootcamps
 	 * @access Public
 	 */
 	create = asyncHandler(async (req, res) => {
-		const bootcamp = await Bootcamp.create(req.body);
+		const bootcamp = await Course.create(req.body);
 		res.status(201).json({ success: true, data: bootcamp });
 	});
 
 	/**
 	 * @desc Update bootcamp
-	 * @route PUT /api/vi/bootcamps/:id
+	 * @route PUT /api/v1/bootcamps/:id
 	 * @access Public
 	 */
 	update = asyncHandler(async (req, res) => {
-		const bootcamp = await Bootcamp.findByIdAndUpdate(req.params.id, req.body, {
+		const bootcamp = await Course.findByIdAndUpdate(req.params.id, req.body, {
 			new: true,
 			runValidators: true,
 		});
@@ -148,18 +128,14 @@ class BootcampController {
 
 	/**
 	 * @desc Destroy bootcamp
-	 * @route PUT /api/vi/bootcamps/:id
+	 * @route PUT /api/v1/bootcamps/:id
 	 * @access Public
 	 */
 	destroy = asyncHandler(async (req, res) => {
-		const bootcamp = await Bootcamp.findById(req.params.id);
-		if (!bootcamp)
-			return next(
-				new ErrorResponse(`Bootcamp not found with id of ${req.params.id}`, 404)
-			);
-		bootcamp.remove();
+		const bootcamp = await Course.findByIdAndDelete(req.params.id);
+		if (!bootcamp) res.status(404).json({ success: false });
 		res.status(202).json({ success: true, data: {} });
 	});
 }
 
-module.exports = new BootcampController();
+module.exports = new CourseController();

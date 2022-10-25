@@ -4,6 +4,7 @@ const morgan = require("morgan");
 const colors = require("colors");
 //Route files
 const bootcamps = require("./routes/bootcamp.route");
+const courses = require("./routes/course.route");
 const connectDB = require("./config/db");
 const errorHandler = require("./middlewares/error");
 
@@ -24,6 +25,7 @@ if (process.env.NODE_ENV === "development") {
 
 // Mount routers
 app.use("/api/v1/bootcamps", bootcamps);
+app.use("/api/v1/courses", courses);
 
 app.use(errorHandler);
 
