@@ -5,7 +5,7 @@ const asyncHandler = require("../middlewares/async");
 class AuthController {
 	/**
 	 * @desc Register user
-	 * @route POST /api/vi/auth/register
+	 * @route POST /api/v1/auth/register
 	 * @access Public
 	 */
 	register = asyncHandler(async (req, res, next) => {
@@ -24,7 +24,7 @@ class AuthController {
 
 	/**
 	 * @desc Login user
-	 * @route POST /api/vi/auth/login
+	 * @route POST /api/v1/auth/login
 	 * @access Public
 	 */
 	login = asyncHandler(async (req, res, next) => {
@@ -44,6 +44,17 @@ class AuthController {
 		if (!isMatch) return next(new ErrorResponse(`Invalid credentials`, 401));
 
 		sendTokenResponse(user, 200, res);
+	});
+
+	/**
+	 * @desc Get current logged in user
+	 * @route GET /api/v1/auth/me
+	 * @access Private
+	 */
+	getMe = asyncHandler(async (req, res, next) => {
+		const user = await User.findById(req.user.id);
+
+		res.status(200).json({ success: true, data: user });
 	});
 }
 // Get token from model, create cookie and send response

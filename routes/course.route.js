@@ -8,6 +8,7 @@ const {
 } = require("../controllers/course.ctrl");
 const advancedResults = require("../middlewares/advancedResults");
 const Course = require("../models/course.model");
+const { protect, authorize } = require("../middlewares/auth");
 
 const router = express.Router({ mergeParams: true });
 
@@ -20,7 +21,11 @@ router
 		}),
 		fetchAll
 	)
-	.post(create);
-router.route("/:id").get(fetch).put(update).delete(destroy);
+	.post(protect, authorize("publisher", "admin"), create);
+router
+	.route("/:id")
+	.get(fetch)
+	.put(protect, authorize("publisher", "admin"), update)
+	.delete(protect, authorize("publisher", "admin"), destroy);
 
 module.exports = router;
