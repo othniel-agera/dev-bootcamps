@@ -150,7 +150,7 @@ class AuthController {
 
 	/**
 	 * @desc Reset password
-	 * @route POST /api/v1/auth/resetpassword/:resettoken
+	 * @route PUT /api/v1/auth/resetpassword/:resettoken
 	 * @access Public
 	 */
 	resetPassword = asyncHandler(async (req, res, next) => {

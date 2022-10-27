@@ -15,6 +15,7 @@ const cors = require("cors");
 //Route files
 const bootcamps = require("./routes/bootcamp.route");
 const courses = require("./routes/course.route");
+const reviews = require("./routes/review.route");
 const auths = require("./routes/auth.route");
 const users = require("./routes/user.route");
 const connectDB = require("./config/db");
@@ -59,6 +60,7 @@ app.use(express.static(path.join(__dirname, "public")));
 // Mount routers
 app.use("/api/v1/bootcamps", bootcamps);
 app.use("/api/v1/courses", courses);
+app.use("/api/v1/reviews", reviews);
 app.use("/api/v1/auth", auths);
 app.use("/api/v1/users", users);
 

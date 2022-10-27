@@ -9,6 +9,7 @@ const {
 	photoUpload,
 } = require("../controllers/bootcamp.ctrl");
 const coursesRouter = require("./course.route");
+const reviewRouter = require("./review.route");
 const advancedResults = require("../middlewares/advancedResults");
 const Bootcamp = require("../models/bootcamp.model");
 const { protect, authorize } = require("../middlewares/auth");
@@ -17,6 +18,7 @@ const router = express.Router();
 
 // Re-router courses
 router.use("/:bootcampId/courses", coursesRouter);
+router.use("/:bootcampId/reviews", reviewRouter);
 
 router.route("/radius/:zipcode/:distance").get(fetchWithinRadius);
 router
