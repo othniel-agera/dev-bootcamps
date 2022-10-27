@@ -10,6 +10,7 @@ const fileupload = require("express-fileupload");
 const bootcamps = require("./routes/bootcamp.route");
 const courses = require("./routes/course.route");
 const auths = require("./routes/auth.route");
+const users = require("./routes/user.route");
 const connectDB = require("./config/db");
 const errorHandler = require("./middlewares/error");
 
@@ -39,6 +40,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/api/v1/bootcamps", bootcamps);
 app.use("/api/v1/courses", courses);
 app.use("/api/v1/auth", auths);
+app.use("/api/v1/users", users);
 
 app.use(errorHandler);
 
