@@ -5,6 +5,12 @@ const morgan = require("morgan");
 const colors = require("colors");
 const cookieParser = require("cookie-parser");
 const fileupload = require("express-fileupload");
+const mongoSanitize = require("express-mongo-sanitize");
+const helmet = require("helmet");
+const xss = require("xss-clean");
+const rateLimit = require("express-rate-limit");
+const hpp = require("hpp");
+const cors = require("cors");
 
 //Route files
 const bootcamps = require("./routes/bootcamp.route");
@@ -32,6 +38,20 @@ if (process.env.NODE_ENV === "development") {
 
 // File uploading
 app.use(fileupload());
+
+// To remove data using these defaults:
+app.use(mongoSanitize());
+// Set security headers
+app.use(helmet());
+app.use(xss());
+// Rate limiting
+const limiter = rateLimit({
+	windowMs: 10 * 60 * 1000, // 10 mins
+	max: 100,
+});
+app.use(limiter);
+app.use(hpp());
+app.use(cors());
 
 // Set static folder
 app.use(express.static(path.join(__dirname, "public")));
